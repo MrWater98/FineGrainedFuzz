@@ -103,12 +103,66 @@ rv_zifencei = {
     'sfence.vma': ('sfence.vma xreg0, xreg1', ('xreg0', 'xreg1',), (), (), ())
 }
 
+
+# uimm5是一个5位的无符号立即数
 rv_zicsr = {
+    # csrrw: CSR Read and Write
+    # - 将 CSR 指定的控制和状态寄存器的值读入寄存器 xreg0
+    # - 将寄存器 xreg1 的值写入 CSR 指定的寄存器
+    # 指令格式: 'csrrw xreg0, CSR, xreg1'
+    # 操作数:
+    # - xreg0: 目标寄存器，存储读取的 CSR 值
+    # - xreg1: 源寄存器，提供要写入 CSR 的新值
     'csrrw' : ('csrrw xreg0, {}, xreg1' , ('xreg0', 'xreg1',), (), ()       , ()),
+    
+    # csrrs: CSR Read and Set
+    # - 将 CSR 指定的控制和状态寄存器的值读入寄存器 xreg0
+    # - 将寄存器 xreg1 的值与 CSR 指定寄存器的值按位或（OR）操作，并写回 CSR
+    # - 如果 xreg1 为零，则只执行读操作
+    # 指令格式: 'csrrs xreg0, CSR, xreg1'
+    # 操作数:
+    # - xreg0: 目标寄存器，存储读取的 CSR 值
+    # - xreg1: 源寄存器，提供要与 CSR 寄存器值进行按位或操作的值
     'csrrs' : ('csrrs xreg0, {}, xreg1' , ('xreg0', 'xreg1',), (), ()       , ()),
+    
+    # csrrc: CSR Read and Clear
+    # - 将 CSR 指定的控制和状态寄存器的值读入寄存器 xreg0
+    # - 将寄存器 xreg1 的值与 CSR 指定寄存器的值按位与（AND）非（NOT）操作，并写回 CSR
+    # - 如果 xreg1 为零，则只执行读操作
+    # 指令格式: 'csrrc xreg0, CSR, xreg1'
+    # 操作数:
+    # - xreg0: 目标寄存器，存储读取的 CSR 值
+    # - xreg1: 源寄存器，提供要与 CSR 寄存器值进行按位与非操作的值
     'csrrc' : ('csrrc xreg0, {}, xreg1' , ('xreg0', 'xreg1',), (), ()       , ()),
+    
+    # csrrwi: CSR Read and Write Immediate
+    # - 将 CSR 指定的控制和状态寄存器的值读入寄存器 xreg0
+    # - 将立即数 uimm5 的值写入 CSR 指定的寄存器
+    # 指令格式: 'csrrwi xreg0, CSR, uimm5'
+    # 操作数:
+    # - xreg0: 目标寄存器，存储读取的 CSR 值
+    # - uimm5: 5 位无符号立即数，提供要写入 CSR 的新值
     'csrrwi': ('csrrwi xreg0, {}, uimm5', ('xreg0',)         , (), (('uimm5', 1),), ()),
+    
+    # csrrsi: CSR Read and Set Immediate
+    # - 将 CSR 指定的控制和状态寄存器的值读入寄存器 xreg0
+    # - 将立即数 uimm5 的值与 CSR 指定寄存器的值按位或（OR）操作，并写回 CSR
+    # - 如果 uimm5 为零，则只执行读操作
+    # 指令格式: 'csrrsi xreg0, CSR, uimm5'
+    # 操作数:
+    # - xreg0: 目标寄存器，存储读取的 CSR 值
+    # - uimm5: 5 位无符号立即数，提供要与 CSR 寄存器值进行按位或操作的值
     'csrrsi': ('csrrsi xreg0, {}, uimm5', ('xreg0',)         , (), (('uimm5', 1),), ()),
+    
+    # csrrci: CSR Read and Clear Immediate
+    # - 将 CSR 指定的控制和状态寄存器的值读入寄存器 xreg0
+    # - 将立即数 uimm5 的值与 CSR 指定寄存器的值按位与（AND）非（NOT）
+    # - 将立即数 uimm5 的值与 CSR 指定寄存器的值按位与（AND）非（NOT）操作，并写回 CSR
+    # - 如果 uimm5 为零，则只执行读操作
+    # 指令格式: 'csrrci xreg0, CSR, uimm5'
+    # 操作数:
+    # - xreg0: 目标寄存器，存储读取的 CSR 值
+    # - uimm5: 5 位无符号立即数，提供要与 CSR 寄存器值进行按位与非操作的值
     'csrrci': ('csrrci xreg0, {}, uimm5', ('xreg0',)         , (), (('uimm5', 1),), ())
 }
 

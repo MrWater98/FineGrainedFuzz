@@ -240,17 +240,97 @@ Dictionary of opcodes - word generation functions
 to handle opcodes which need special instructions
 """
 opcodes_words = {
+    # jal: Jump and Link
+    # - 处理 'jal' 指令
+    # - 指令格式: 'jal rd, offset'
+    # - 操作数:
+    #   - rd: 目标寄存器，存储返
     'jal': (['jal'], word_jal),
+    
+    # jalr: Jump and Link Register
+    # - 处理 'jalr' 指令
+    # - 指令格式: 'jalr rd, rs1, offset'
+    # - 操作数:
+    #   - rd: 目标寄存器，存储返回地址
+    #   - rs1: 源寄存器，提供基地址
+    #   - offset: 相对于基地址的偏移量
     'jalr': (['jalr'], word_jalr),
+    
+    # branch: Branch Instructions
+    # - 处理分支指令，如 'beq', 'bne' 等
+    # - 指令格式: 'beq rs1, rs2, offset'
+    # - 操作数:
+    #   - rs1: 源寄存器1
+    #   - rs2: 源寄存器2
+    #   - offset: 分支跳转偏移量
     'branch': (list(rv32i_btype.keys()), word_branch),
+    
+    # ret: Return Instructions
+    # - 处理返回指令，如 'mret', 'sret', 'uret'
+    # - 指令格式: 'mret'（机器模式返回）, 'sret'（超级用户模式返回）, 'uret'（用户模式返回）
     'ret': (['mret', 'sret', 'uret'], word_ret),
+    
+    # mem_r: Memory Read Instructions
+    # - 处理内存读指令，如 'lb', 'lh', 'lw' 等
+    # - 指令格式: 'lb rd, offset(rs1)'
+    # - 操作数:
+    #   - rd: 目标寄存器，存储读取的数据
+    #   - offset: 内存地址偏移量
+    #   - rs1: 基地址寄存器
     'mem_r': (['lb', 'lh', 'lw', 'ld', 'lbu', 'lhu', 'lwu', \
                'flw', 'fld', 'flq'], word_mem_r),
+    
+    # mem_w: Memory Write Instructions
+    # - 处理内存写指令，如 'sb', 'sh', 'sw' 等
+    # - 指令格式: 'sb rs2, offset(rs1)'
+    # - 操作数:
+    #   - rs2: 源寄存器，提供要写入的数据
+    #   - offset: 内存地址偏移量
+    #   - rs1: 基地址寄存器
     'mem_w': (['sb', 'sh', 'sw', 'sd', 'fsw', 'fsd', 'fsq'], word_mem_w),
+    
+    # atomic: Atomic Instructions
+    # - 处理原子操作指令，如 'amoadd.w', 'amoswap.w' 等
+    # - 指令格式: 'amoadd.w rd, rs2, (rs1)'
+    # - 操作数:
+    #   - rd: 目标寄存器，存储操作结果
+    #   - rs2: 源寄存器，提供操作数
+    #   - rs1: 基地址寄存器
     'atomic': (list(rv32a.keys()) + list(rv64a.keys()), word_atomic),
+    
+    # csr_r: CSR Read/Write Instructions
+    # - 处理 CSR 读/写指令，如 'csrrw', 'csrrs', 'csrrc'
+    # - 指令格式: 'csrrw rd, csr, rs1'
+    # - 操作数:
+    #   - rd: 目标寄存器，存储读取的 CSR 值
+    #   - csr: CSR 寄存器地址
+    #   - rs1: 源寄存器，提供要写入 CSR 的新值
     'csr_r': (['csrrw', 'csrrs', 'csrrc'], word_csr_r),
+    
+    # csr_i: CSR Immediate Instructions
+    # - 处理 CSR 立即数指令，如 'csrrwi', 'csrrsi', 'csrrci'
+    # - 指令格式: 'csrrwi rd, csr, uimm'
+    # - 操作数:
+    #   - rd: 目标寄存器，存储读取的csr 值
+    #   - csr: CSR 寄存器地址
+    #   - uimm: 立即数，提供要写入 CSR 的新值
     'csr_i': (['csrrwi', 'csrrsi', 'csrrci'], word_csr_i),
+    
+    # sfence: Supervisor Memory-Management Fence
+    # - 处理 'sfence.vma' 指令
+    # - 指令格式: 'sfence.vma rs1, rs2'
+    # - 操作数:
+    #   - rs1: 源寄存器1，用于提供地址
+    #   - rs2: 源寄存器2，用于提供 ASID
     'sfence': (['sfence.vma'], word_sfence),
+    
+    # fp: Floating-Point Instructions
+    # - 处理浮点指令，如 'fadd.s', 'fsub.s' 等
+    # - 指令格式: 'fadd.s rd, rs1, rs2'
+    # - 操作数:
+    #   - rd: 目标寄存器，存储浮点操作结果
+    #   - rs1: 源寄存器1，提供浮点操作数1
+    #   - rs2: 源寄存器2，提供浮点操作数2
     'fp': (list(rv32f.keys()) + list(rv64f.keys()) + list(rv32d.keys()) + \
             list(rv64d.keys()) + list(rv32q.keys()) + list(rv64q.keys()),
            word_fp)

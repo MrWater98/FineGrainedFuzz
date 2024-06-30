@@ -13,8 +13,36 @@ Properties
 """
 class rvInstGenerator():
     def __init__(self, isa='RV64G'):
+        # RISC-V 32-bit Integer Base ISA: 这是最基本的 RISC-V 指令集，支持 32 位的整数运算。所有 RISC-V 处理器都至少支持这个指令集。
+        '''
+        标准扩展
+        M (Multiplication and Division):
+        整数乘法和除法扩展: 提供对整数乘法和除法的支持，增强了基本整数操作的能力。
+        A (Atomic):
+        原子操作扩展: 提供对原子性内存操作的支持，主要用于多核处理器中的并发控制。
+        F (Single-Precision Floating-Point):
+        单精度浮点数扩展: 提供对单精度(32 位)浮点数运算的支持。
+        D (Double-Precision Floating-Point):
+        双精度浮点数扩展: 提供对双精度(64 位)浮点数运算的支持。需要 F 扩展。
+        Q (Quad-Precision Floating-Point):
+        四精度浮点数扩展: 提供对四精度(128 位)浮点数运算的支持。需要 D 扩展。
+        C (Compressed):
+        压缩指令集扩展: 提供一组压缩指令，可以减少程序的代码大小，提高代码密度。
+        Zifencei (Instruction-Fetch Fence):
+        指令获取屏障扩展: 提供用于确保指令获取顺序正确的屏障指令，主要用于自修改代码或代码和数据分离的场景。
+        Zicsr (Control and Status Register):
+        控制和状态寄存器扩展: 提供对控制和状态寄存器(CSR)的访问和操作。
+        工业扩展
+        G (General):
+        通用扩展：通常被定义为包含 RV32I、M、A、F、D、Zifencei 和 Zicsr 扩展的组合。这是一个通用的、适用于大多数应用的扩展集合。
+        特定扩展
+        trap_ret:
+        陷阱和返回扩展：通常用于处理异常和中断，提供陷阱处理和返回指令。
+        RV32 和 RV64 的区别
+            RV32 系列支持 32 位地址和数据操作，适用于低功耗和嵌入式系统。
+            RV64 系列支持 64 位地址和数据操作，适用于高性能和服务器级系统。
+        '''
         isas = ['trap_ret']
-
         if 'I' in isa:
             isas += [ 'rv32i' ]
         if 'M' in isa:
@@ -175,7 +203,7 @@ class rvInstGenerator():
         imms = list(imms)
         symbols = list(symbols)
         #print(xregs, fregs, imms, symbols)
-        tpe = NONE
+        tpe = NONE # 
         insts = [ syntax ]
 
         for (key, tup) in opcodes_words.items():

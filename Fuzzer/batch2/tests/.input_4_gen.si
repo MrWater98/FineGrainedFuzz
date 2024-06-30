@@ -1,0 +1,576 @@
+v-u
+
+_p0:    xor x11, x11, x11                         
+        csrrw x12, satp, x11                      
+_p1:    csrrci x12, mtval, 2                      
+_p2:    xor x14, x14, x14                         
+        addi x10, zero, 1                         
+        slli x10, x10, 29                         
+        add x14, x14, x10                         
+        csrrs x13, medeleg, x14                   
+_l0:    csrrsi x10, mip, 21                       0000
+_l1:    fcvt.w.s x20, f30, dyn                    0000
+_l2:    flt.s x28, f17, f29                       0000
+_l3:    la x17, d_3_27                            0000
+        addi x17, x17, 16                         0000
+        lr.d x21, (x17)                           0000
+_l4:    ori x17, x17, 577                         0000
+_l5:    la x19, d_1_25                            0000
+        addi x19, x19, 0                          0000
+        amoxor.d x29, x3, (x19)                   0000
+_l6:    fmax.s f29, f14, f14                      0000
+_l7:    subw x12, x27, x22                        0000
+_l8:    la x6, d_1_4                              0000
+        addi x6, x6, 20                           0000
+        amomin.w x28, x29, (x6)                   0000
+_l9:    fmv.x.w x27, f30                          0000
+_l10:   la x27, d_3_7                             0000
+        sb x3, -31(x27)                           0000
+_l11:   slliw x17, x17, 12                        0000
+_l12:   li x23, 1                                 0000
+        la x3, pt2                                0000
+        addi x3, x3, 32                           0000
+        sfence.vma x23, x3                        0000
+_l13:   la x26, d_0_10                            0000
+        addi x26, x26, -20                        0000
+        amoadd.w x30, x16, (x26)                  0000
+_l14:   fle.s x29, f25, f13                       0000
+_l15:   csrrci x27, frm, 25                       0000
+_l16:   fence                                     0000
+_l17:   jal x12, _l94                             0000
+_l18:   la x24, d_1_12                            0000
+        addi x24, x24, -16                        0000
+        amoswap.w x9, x30, (x24)                  0000
+_l19:   la x9, d_0_21                             0000
+        addi x9, x9, 16                           0000
+        amoand.d x29, x15, (x9)                   0000
+_l20:   fcvt.s.wu f0, x27, dyn                    0000
+_l21:   la x11, d_2_21                            0000
+        ld x25, -16(x11)                          0000
+_l22:   flt.s x10, f6, f30                        0000
+_l23:   la x21, _l57                              0000
+        csrrw zero, uepc, x21                     0000
+        uret                                      0000
+_l24:   fsgnj.s f12, f12, f21                     0000
+_l25:   fsgnjx.s f29, f0, f22                     0000
+_l26:   lui x16, 549758                           0000
+_l27:   la x21, d_0_19                            0000
+        sw x29, -24(x21)                          0000
+_l28:   la x23, _l31                              0000
+        lb x17, -5(x23)                           0000
+_l29:   la x12, d_2_23                            0000
+        lhu x26, 0(x12)                           0000
+_l30:   bltu x1, x21, _l81                        0000
+_l31:   div x3, x9, x19                           0000
+_l32:   fmv.x.w x12, f30                          0000
+_l33:   fclass.s x6, f13                          0000
+_l34:   csrrsi x26, mie, 26                       0000
+_l35:   fadd.s f31, f14, f25, rdn                 0000
+_l36:   la x24, d_1_25                            0000
+        addi x24, x24, 28                         0000
+        lui x14, 0xffe00                          0000
+        xor x24, x24, x14                         0000
+        amoadd.w x1, x14, (x24)                   0000
+_l37:   bgeu x30, x28, _l77                       0000
+_l38:   la x30, d_3_26                            0000
+        addi x30, x30, -28                        0000
+        amoadd.w x28, x19, (x30)                  0000
+_l39:   fence                                     0000
+_l40:   la x5, d_2_15                             0000
+        addi x5, x5, 12                           0000
+        amoswap.w x2, x20, (x5)                   0000
+_l41:   fsgnjx.s f17, f23, f21                    0000
+_l42:   mulhsu x17, x29, x12                      0000
+_l43:   auipc x16, 1048575                        0000
+_l44:   subw x16, x28, x14                        0000
+_l45:   mulw x21, x18, x24                        0000
+_l46:   fmax.s f27, f16, f13                      0000
+_l47:   fsqrt.s f16, f23, rne                     0000
+_l48:   la x24, d_3_12                            0000
+        addi x24, x24, -28                        0000
+        amominu.w x28, x20, (x24)                 0000
+_l49:   fcvt.lu.s x7, f21, rmm                    0000
+_l50:   sltiu x17, x18, -33                       0000
+_l51:   flt.s x18, f5, f24                        0000
+_l52:   auipc x14, 12                             0000
+_l53:   la x30, _l91                              0000
+        csrrw zero, sepc, x30                     0000
+        sret                                      0000
+_l54:   sllw x5, x15, x15                         0000
+_l55:   mulhsu x24, x22, x6                       0000
+_l56:   la x25, _l100                             0000
+        csrrw zero, mepc, x25                     0000
+        mret                                      0000
+_l57:   la x22, d_5_9                             0000
+        lb x30, -13(x22)                          0000
+_l58:   la x7, d_2_6                              0000
+        addi x7, x7, 20                           0000
+        amoand.w x15, x3, (x7)                    0000
+_l59:   la x13, d_1_4                             0000
+        addi x13, x13, -28                        0000
+        amoxor.w x20, x9, (x13)                   0000
+_l60:   fsgnjx.s f30, f24, f30                    0000
+_l61:   fcvt.lu.s x2, f7, rup                     0000
+_l62:   addiw x9, x30, 0                          0000
+_l63:   mulhu x25, x7, x20                        0000
+_l64:   feq.s x28, f19, f0                        0000
+_l65:   fsgnj.s f9, f3, f7                        0000
+_l66:   li x13, 0                                 0000
+        la x24, pt0                               0000
+        addi x24, x24, 48                         0000
+        sfence.vma x13, x24                       0000
+_l67:   slliw x27, x15, 11                        0000
+_l68:   la x10, d_3_21                            0000
+        addi x10, x10, 0                          0000
+        amomaxu.w x15, x29, (x10)                 0000
+_l69:   la x17, d_2_18                            0000
+        lb x2, -1(x17)                            0000
+_l70:   la x10, d_4_9                             0000
+        addi x10, x10, -28                        0000
+        amoor.w x10, x6, (x10)                    0000
+_l71:   la x3, _l54                               0000
+        flw f9, -4(x3)                            0000
+_l72:   remu x22, x17, x1                         0000
+_l73:   remu x22, x9, x13                         0000
+_l74:   sltiu x24, x29, 131                       0000
+_l75:   fence                                     0000
+_l76:   la x26, d_4_16                            0000
+        lh x1, -12(x26)                           0000
+_l77:   addw x20, x18, x26                        0000
+_l78:   la x30, d_2_25                            0000
+        addi x30, x30, 0                          0000
+        amomin.w x14, x28, (x30)                  0000
+_l79:   fsgnjx.s f26, f5, f7                      0000
+_l80:   rem x0, x26, x14                          0000
+_l81:   la x29, d_5_23                            0000
+        lhu x22, 6(x29)                           0000
+_l82:   sraw x10, x2, x5                          0000
+_l83:   sltiu x6, x26, 1061                       0000
+_l84:   la x20, d_3_25                            0000
+        addi x20, x20, 20                         0000
+        amoswap.w x10, x14, (x20)                 0000
+_l85:   la x10, d_2_25                            0000
+        addi x10, x10, 16                         0000
+        amomaxu.w x26, x1, (x10)                  0000
+_l86:   rem x1, x17, x20                          0000
+_l87:   la x27, d_2_16                            0000
+        addi x27, x27, -4                         0000
+        amoor.w x7, x18, (x27)                    0000
+_l88:   mulhsu x8, x10, x1                        0000
+_l89:   fcvt.s.l f5, x19, rdn                     0000
+_l90:   srliw x18, x17, 20                        0000
+_l91:   fadd.s f17, f5, f20, dyn                  0000
+_l92:   la x27, d_3_12                            0000
+        ld x5, -24(x27)                           0000
+_l93:   fle.s x18, f26, f6                        0000
+_l94:   bne x19, x28, _l96                        0000
+_l95:   la x12, _l97                              0000
+        csrrw zero, sepc, x12                     0000
+        sret                                      0000
+_l96:   srli x9, x0, 14                           0000
+_l97:   remw x13, x7, x4                          0000
+_l98:   andi x0, x28, -1973                       0000
+_l99:   fence                                     0000
+_l100:  li x9, 0                                  0000
+        la x14, pt1                               0000
+        addi x14, x14, 24                         0000
+        sfence.vma x9, x14                        0000
+_l101:  ecall                                     0000
+_l102:  addiw x16, x9, 501                        0000
+_s0:    mulw x7, x12, x15                         
+_s1:    la x19, d_4_20                            
+        addi x19, x19, 8                          
+        amomin.d x16, x19, (x19)                  
+_s2:    bltu x15, x28, _s3                        
+_s3:    li x15, 1                                 
+        la x4, pt1                                
+        addi x4, x4, 8                            
+        sfence.vma x15, x4                        
+_s4:    la x21, d_1_10                            
+        addi x21, x21, -12                        
+        amomaxu.w x14, x28, (x21)                 
+data:
+68766f31a5e0116a
+415a17adeba059d6
+56e4ef2924fc3be2
+c5f4ec61c5b8fab0
+1a5ce08cdf920b15
+c1895d2eb2a915de
+1666677e4ff31e89
+80fa80b3b99e8ced
+00bf988602efbaa9
+12ae24ef4279e1fb
+f00ee5ea22caec65
+881337ef6970d148
+4f4abcb61fd97551
+a6630af1815f2d41
+ec156248ce2c5abf
+92a298bb76c873c5
+2ec30e3d9fd807fe
+86696a8e8126b802
+329315213597afe0
+1d2267fc4cd3be7b
+646f523dc034c862
+8df8c362a9747de7
+7918dd732c1d4725
+d6565a98c8a255d4
+15705ba1cbd81ccd
+b4b5ee12101ecfd3
+ced705f911636173
+2d9c5d224b315836
+c62de1f69aa03c86
+248f4e8cc2dcbe60
+da9d710f18eee1ab
+df671af4cba593b6
+8ba8b47acd4e1509
+be299f9a2a50b794
+2cca6db8895a4672
+277c99b0896b7d60
+6475888ffb36d74c
+303a6a4919e67182
+ec42d7bc1f8a1dcd
+b04ffe9cbbcba896
+a9fc2da616308574
+051bd57cead22d87
+71d5902ef6584026
+014d20321954fd2d
+ce7127e0fc1a92c7
+f2091b510e71f6c9
+83acd939bfbb3a41
+a5fb6cdf74e034f6
+3d3467d51a1b656c
+0c11456190339523
+5839d8f6bff4aabf
+4437547ac0ca0cae
+f6787b4ec7d240c1
+2e859400748b8695
+14befb9d6b7b7f0a
+cec8774b754f8d16
+af8d07602ef080f4
+8a897523fc305c61
+645c9f11abe86b20
+81163a605cc8ec7b
+ba8a1c8ad5bdc8ef
+f32092506df66078
+6342ba9b3708c3f6
+fd109d40509d63de
+73204a20ce03cb12
+b08fe8339298e8c0
+8c7d63aef43ae0a0
+377b00de29e74a71
+93aaf0be806ba2ec
+de797d1c47b943e5
+bedfabcce06e1a6e
+f83b832d1f09f588
+cadd4a4da7de69c3
+22ce31101a62fa86
+2c37a75b8bdd3620
+cab41e2e2bf53cbd
+bea45bf99e635285
+687124fed205c812
+f9676dca8f938bc7
+361e5702e3c68cff
+a68d0a45b273a656
+701facd44bfc951a
+17f68a83703369a0
+c2a8d6d0b3b6f45b
+29c3d22e4549c515
+432b7a4d29fcce92
+ea777c8f2bf505c1
+ea9d45bc1893e095
+c493fe002dc464b5
+74ed7618ac3f0cc4
+cc737d2b71d7ec6f
+07b6a1e9a7aff67d
+f9690d02c7a27347
+f4c33710ab8bba63
+a7e97eabaf2c2379
+53f9ec520d0f7675
+5955beef716eaabb
+78df7a89acbb9cf6
+2f1d936d69b39fc9
+4f197d27cd738963
+9fe2000dea48dcfc
+aa1a2755f31b067c
+33992a88d88a4fa3
+6383c3667f5bd886
+d007a17c8e6577ec
+25b96339ce415e20
+f905a96d95589b2f
+fb84b9313c7b4efd
+a3882fc1406a3dbb
+98ade53825ff1e4d
+cb878b694a533a18
+3842485bbb7659e6
+fda11c747eebcc89
+7e7b52b946ad2ee6
+8754344b9ae6e31d
+13941a34fdee936d
+f1b68efa55dd3aec
+e73cdfe88759e732
+bcf9165ffefd8093
+3755419c1dfd06b2
+ea16f97a26249e5d
+beb5300a4909d71f
+26b72cfd20e2a753
+09749ef8c0584e6c
+132ad11fbe3d0982
+9f4f80cd48040042
+0365e5717d2b9e56
+5343c59700ead653
+16ee400bc82375b0
+ac0754f2ded8d6ea
+65c28dcb99cd5889
+ed6d0cbeea284f5c
+46ae9e0cfbd733a8
+6191c1cac2833987
+b71b94b5095cee53
+3a6010b018a82098
+32f4c17f1e881558
+ef9f18e5b7851e46
+53bda5c8ca5cbd12
+9c1d3ce2c563d778
+ec70bf8f68009a00
+d4a4d46b80c25fd1
+ad7e617f383ea069
+eb4b3d0c420be737
+29ef63c596afc2ee
+0f5effaf6653cc9d
+782efef1aec197a8
+b1a868d4cd16d914
+09ce2bf7180e2618
+2866f6c1bd681248
+a46ab2b5aa48881a
+1ad56cbaeb4a75c0
+63f15256c2483d35
+05eb2a26eef681cd
+64604b2199334aa7
+988902b446ee550e
+e3df0f27c96b2655
+4c7323f723f26d82
+d9b4b6e5034032ce
+998daaa0e32922ab
+11fe6951d4536d9a
+812c9c859f28d982
+06a7fef1c39776df
+fa7fd306f7c9b073
+0a1c68cbba05664e
+b95b052d2942db5d
+87e2f412a0475e8a
+778e83ab0b4d391d
+af24445ab1ac2855
+d957d59ddda86831
+e20db0d1252f10f5
+edbbb2203a46c0fb
+d2f970debb91b259
+f09bedee1c9fdc07
+525cacfd6c38fbc4
+7f9cee7ace0f2678
+15ab6de3d425b2b8
+8765a60653c1ab40
+67b2ce0597efc8ae
+2f75f65c667ae0a7
+1273fede8a4b0a43
+d0f293887c01c7f4
+7186679a88bb533f
+9fda73728c182c4f
+ee746ab896776ecb
+dcaa5a8e3115b72e
+c6f8df49b4d24f25
+e363f7290f5f3928
+523e1b3b0e3c9c49
+05c25be6a1590d22
+68fb7a12ac2d8ad5
+29d6a058e6b8cea5
+2254c5b78eda8be7
+5989e161202890f0
+dce0876ca61c845d
+6b05b38d514d9719
+787ee287d3e52a83
+624161793c879656
+d8430b8284fc8e80
+6eafbf417e03a4c9
+5f72c6d4d71de038
+68c80c9c9ccd60ee
+00f8e23099046355
+14363d1c7ba87456
+c6c4d484614748be
+0bb6b701bcd10805
+222ed477c8504ed8
+853d420505ed4d34
+c4625573919676ef
+ea5b8c42ab0b3e3d
+6a2420ed57003ab7
+ca35ee240f5d6c5c
+359f45d8f5a8830b
+cb7ae7b6ca5af460
+f3c066670cd2305d
+9e2caf9ad95f3025
+1c84bc1cf86f2746
+0ec3801c143a05d8
+0f448fc79d341c56
+9b9258403a94e0c1
+dcd0e6eb10580e0c
+87134258a7889a9b
+d72dae229090bf91
+351aaa8e4e89337e
+a62b2d0b100037d5
+52106eaf5eec61ff
+f4108f83e6754da3
+a65c47c564169459
+37691603cbe00173
+8a9bae9a54645cd5
+ecc3f7e6982c808f
+c9adf7cc296fe764
+a600df5ad088b0b1
+e5503a4eba605462
+3215ffc9504b9626
+d9ac35761fa02edf
+bde90d64ba06fee8
+9e0935acc117474d
+c455e9369cd2a2bd
+358de761c940c0da
+772038aee619fe48
+598855c995b8f6b9
+8b5da58f7d6ce19f
+a04570780e6a822c
+e8560959197f7b4b
+f09c5ef295bdd6a5
+fa9c9ad9f341ad59
+7cbe94eb34c666b2
+4f3f0d6549caf768
+e00014848c63bfd2
+272a18fa1f4b9d99
+7d697cd53ef48e92
+6fc9b2834104a456
+0f38dd0f790f983c
+70ab43dd813fda6c
+16a205a7de1774ee
+d519c2db6137a08b
+b3664680bc028c5b
+4439d9cf9c23aeb2
+2a649946c14d2023
+12b0c85f71d124df
+430f79dda59e4289
+4b8cd168b1352a9e
+649668a94e8709b9
+41944d97ea6a6c1a
+bd9827279398e0c3
+5eb6720f8372e69a
+e18a048e411b93be
+9d2269e91d3e0856
+fec3c8a7d1c021c4
+2641bdd7cf65d662
+cf451ab9c66a43b3
+9149aee5bba7a789
+2d3705a0433bd8cf
+95b97b3e8366e149
+e168ca9044987097
+dd1493916b5bbc66
+87cd4b0c4b7a3441
+a337587e136e2aa7
+cf6d2abecfc44e38
+1927f42a40f47a92
+49a5e9a30f67bd36
+675e2f13665a4d71
+a58ab509a0ac910a
+71322a5e72f97a92
+1f653114089279de
+ea4b3a3d66bf3c35
+0812e5557b4990f6
+f5dddb9dd171d929
+77f8be905903f737
+50557e2b4e696151
+8a610d5ab19d373f
+7076b5e5c0ddc62c
+5999d26f4c304397
+9aaa41d5ea3b9ebd
+cae8b6177f36049b
+3c6b4590a081c963
+cedaed4508eb8d77
+ab83a2cbd6d22749
+c4c2d0a6371bea98
+8be8fdda23ed70e9
+a31728d1a16565ed
+59764dc74d6336f7
+ad581b034a5fdf4b
+c3adf9e9009b1ac9
+7863ba6c278df8dd
+493c80d9da0e0ceb
+e8da562f6014ce6c
+29201e9b83c466fa
+48387a4b4da3bc79
+3cd296e3ee01bd83
+eca0ee569697e06d
+111ecd3c2e28f901
+25b12ac25df9754a
+80c56c0ddba2fcc3
+135d6414c6703ce9
+63a2706f5390c305
+e7c5e0a012ff8afa
+87b4dad7fab4d9c4
+77be8c2fa0dec920
+6636a13483aef318
+703befd5d93df21b
+3d3f7450ad702a00
+f4c0eb46b94d0226
+528708fd3a467e83
+8196f6a7128dfdf1
+096c17d27656178a
+ea54ca0c9dffbada
+d00510cc528923e2
+227028527392a9d8
+fbf3c4461e97a30f
+38ea126182d38a55
+f502cf00b78f9a09
+5058eccbce875102
+e6d70ea4b67ad343
+e3ae68ea6d2db0a4
+18581f08cd4e0e11
+8a3955497519f2e6
+ceac8287af5aab55
+a6d9740fad7a0023
+c31d33c271d7d114
+e525c3194b6d3fff
+baebe181d115bd79
+0a1889b1c3f9e696
+6b66cb646c008197
+a3beb56ccd66d209
+283eba182d101636
+2ef5fd813dae62fa
+afd7f5bb17b599e4
+e6c31244a25c4f48
+ce618ef4026fad0e
+e0b015033093d084
+7887e261d12ae744
+1801934b3774296f
+b6c202bfa81e99ab
+91f47864f612e61c
+6e36afca8efa1732
+7caf0d8848296e1c
+88a3954eb09735af
+4c4a701b074c1033
+5ecc8e9b78f6e128
+a5fd80f9d26bb894
+44f7328f318527d9
+8b99e89b5a3d76bd
+00dc88a132ae114e
+d3dce16e906621c6
+f337908395f7fe21
+ee507f28d72e9a13
+769f3225b3a6624c
+a02cf33a194dbeef
+0c81e241579df1d9
+9394a3e6ba2cea77
+eefb3cb117bd149c
+a353819f05e570ed
+bbc268302fc184ac
+d3db117c699e8bf0
+048847cd323e49fc
+8775036c144dd8b9
+89c1e65b23e7b224
+d8fd7934f10b1525
+b2802be23168293d
+63513613e0624449
+e246f836044bd6fb
+758aa0812e56f3f7

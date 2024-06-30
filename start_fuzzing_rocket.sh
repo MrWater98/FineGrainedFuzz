@@ -35,4 +35,4 @@ then
 	export SPIKE="/root/riscv-isa-sim-all-csr/build/bin/spike"
 fi
 
-make SIM_BUILD=build_rocket_batch${BATCHNO} VFILE=RocketTile_latest TOPLEVEL=RocketTile NUM_ITER=${ITERS} OUT=batch${BATCHNO} ALL_CSR=${ALL_CSR} FP_CSR=${FP_CSR} |& tee run.${BATCHNO}.rocket.log
+make SIM_BUILD=build_rocket_batch${BATCHNO} VFILE=RocketTile_CFG TOPLEVEL=RocketTile NUM_ITER=${ITERS} OUT=batch${BATCHNO} ALL_CSR=${ALL_CSR} FP_CSR=${FP_CSR} DEBUG=0 |& tee run.${BATCHNO}.rocket.log

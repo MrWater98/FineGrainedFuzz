@@ -4,7 +4,7 @@ import math
 import random
 import queue
 from cocotb.decorators import coroutine
-from cocotb.triggers import Timer, RisingEdge
+from cocotb.triggers import Timer, RisingEdge, Edge
 
 from adapters.tilelink.definitions import *
 from adapters.tilelink.utils import *
@@ -40,6 +40,16 @@ TL-C
 
 """
 
+"""
+A, D, B, C, E 这些字母可能指的是 TileLink 协议中的不同信号通道。
+TileLink 是一个用于片上互连的开源协议,广泛应用于 RISC-V 生态系统中。TileLink 协议定义了五种主要的信号通道,每个通道都有特定的用途和数据流方向：
+
+A通道 (A Channel): 请求信号通道,用于发出读写请求。
+D通道 (D Channel): 响应信号通道,用于响应A通道的请求。
+B通道 (B Channel): 探测信号通道,用于发起探测请求（例如缓存一致性协议中的探测）。
+C通道 (C Channel): 释放信号通道,用于释放缓存线或传输数据。
+E通道 (E Channel): 完成信号通道,用于确认C通道的传输已完成。
+"""
 class tlAdapter():
     def __init__(self, dut, port_names, protocol=TL_UL, block_size=64, debug=False):
         self.dut = dut
@@ -744,10 +754,25 @@ class tlAdapter():
         self.probe = 1
         self.probe_addr = probe_addr
 
+    @coroutine
+    def monitor_signal(self):
+        signal = self.a_ports.valid
+        previous_value = signal.value
+        while True:
+            # 等待信号的任何边沿变化
+            yield Edge(signal)
+            
+            # 记录当前仿真时间和信号的新值
+            new_value = signal.value
+            
+            previous_value = new_value
+
+        
+
     def start(self, memory):
         self.drive = True
         self.retrieve = False
-
+        cocotb.fork(self.monitor_signal())
         self.drive_input(memory)
 
     def stop(self):

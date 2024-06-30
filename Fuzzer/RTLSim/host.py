@@ -31,6 +31,9 @@ class rvRTLhost():
         port_names = paths['port_names']
         monitor_pc = paths['monitor_pc']
         monitor_valid = paths['monitor_valid']
+        # wb_reg_pc: 在写回阶段，wb_reg_pc 保存了当前正在写回的指令的地址。这对于调试和错误处理非常有用，因为你可以追踪到具体是哪条指令引发了异常或错误。
+        # wb_reg_valid: 在写回阶段，wb_reg_valid 信号指示当前写回的结果是否有效。如果某条指令在执行过程中被取消或发生了异常，
+        # wb_reg_valid 可能会被设置为无效（例如，低电平），以防止错误的数据被写回寄存器文件或内存。
         monitor = (monitor_pc[0], monitor_valid[0])
 
         self.rtl_sig_file = rtl_sig_file
@@ -77,6 +80,8 @@ class rvRTLhost():
             clock <= 0
             yield Timer(period / 2)
 
+
+
     @coroutine
     def reset(self, clock, metaReset, reset, timer=5):
         clkedge = RisingEdge(clock)
@@ -107,6 +112,20 @@ class rvRTLhost():
         cov_mask = (1 << len(self.dut.io_covSum)) - 1
         return self.dut.io_covSum.value & cov_mask
 
+    def get_path(self):
+        # Iterate all coverages with coverage{i}
+        path_list = []
+        for i in range(0,50):
+            # if getattr(dut, "coverage{i}") is exist
+            if hasattr(self.dut, "coverage{}".format(i)):
+                visit_path = getattr(self.dut, "coverage{}".format(i)).value
+                for j in range(0, len(visit_path)):
+                    if visit_path[j]==1:
+                        path_list.append((i,j))
+            else:
+                break
+        return path_list
+    
     @coroutine
     def run_test(self, rtl_input: rtlInput, assert_intr: bool, iteration):
 
@@ -126,6 +145,12 @@ class rvRTLhost():
         for (i, addr) in enumerate(range(_start, _end + 36, 8)):
             memory[addr] = int(lines[i], 16)
 
+        '''
+        tohost 是一个特殊地址，用于与仿真器或测试环境进行通信。在 RISC-V 的测试和仿真环境中，典型的用法如下：
+        报告测试结果: 将特定值写入 tohost 地址，以通知测试环境测试的状态（通过、失败等）。
+        中断模拟: 在某些仿真环境中，写入 tohost 可以触发仿真器执行某些操作，如停止仿真或者生成中断。
+        在上述代码中，将 1 写入 tohost 可能表示测试结束或成功。
+        '''
         tohost_addr = symbols['tohost']
         sig_start = symbols['begin_signature']
         sig_end = symbols['end_signature']
@@ -200,4 +225,4 @@ class rvRTLhost():
         self.save_signature(memory, sig_start, sig_end, data_addrs, self.rtl_sig_file)
         self.debug_print('[RTLHost] Stop RTL simulation')
 
-        return (SUCCESS, self.get_covsum())
+        return (SUCCESS, self.get_covsum(), self.get_path())

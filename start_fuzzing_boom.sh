@@ -14,7 +14,7 @@ export SPIKE="/root/lowrisc/bin/spike"
 #export MUTATE_FINER=0
 #export MEDELEG_MOD=0
 export FP_CSR=0
-export ALL_CSR=0
+export ALL_CSR=1
 
 # Only enable one config at a time
 if [ "$FP_CSR" == "1" ]

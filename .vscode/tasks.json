@@ -1,0 +1,45 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+
+        {
+            "label": "make-rocket",
+            "type": "shell",
+            "command": "bash -c './start_fuzzing_rocket.sh 4 100'",
+            "options": {
+                "cwd": "${workspaceFolder}",
+            },
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "detail": "Generated task for running make.",
+            "problemMatcher": {
+                "owner": "custom",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": [
+                    {
+                        "regexp": ".",
+                        "file": 1,
+                        "line": 2,
+                        "message": 3
+                    }
+                ],
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".*",
+                    "endsPattern": ".*Ready For Connections.*"
+                }
+            }
+        },
+        {
+            "label": "kill-port-4000",
+            "type": "shell",
+            "command": "bash -c './start_fuzzing_rocket.sh 1 100'",
+            "options": {
+                "cwd": "${workspaceFolder}",
+            },
+        }
+    ]
+}

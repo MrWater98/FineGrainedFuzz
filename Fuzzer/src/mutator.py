@@ -1,6 +1,7 @@
 import os
 import random
 from copy import deepcopy
+import pickle
 
 from inst_generator import Word, rvInstGenerator, PREFIX, MAIN, SUFFIX
 
@@ -36,6 +37,10 @@ class simInput():
         self.template = template
         self.it = 0
         self.name_suffix = '' 
+        
+        self.visited_path = []
+        self.explr_point = float(0)
+        self.uncov_alt_br = 0
 
     def save(self, name, data=[]):
         prefix_insts = self.get_prefix()
@@ -90,28 +95,52 @@ class simInput():
 
         insts.append(SUFFIX + '{}:'.format(self.num_suffix))
         return insts
+    
+    def set_visit_path(self, visit_path, CFG):
+        new_visit_path = []
+        for item in visit_path:
+            if item in CFG['count_to_assign']:
+                count_value = CFG['count_to_assign'].get(item)
+                self.visited_path.append(CFG['assign_to_block'][count_value])
+                new_visit_path.append(item)
+
+        # 清空原始的 visit_path 列表
+        visit_path.clear()
+
+        # 将新的路径添加到 visit_path 列表中
+        visit_path.extend(new_visit_path)
+
 
 
 class rvMutator():
-    def __init__(self, max_data_seeds=100, corpus_size=1000, no_guide=False):
+    def __init__(self, max_data_seeds=100, corpus_size=2000, no_guide=False, top_module=None):
         self.corpus_size = corpus_size
         self.corpus = []
 
         self.phases = [GENERATION, MUTATION, MERGE]
         self.phase = GENERATION
 
+        # 这个是什么意思，为什么num_prefix是3呢？num_prefix又是什么意思?
         self.num_prefix = 3
         self.num_words = 100
+        # 这个是什么意思，为什么num_suffix是3呢？num_suffix又是什么意思?
         self.num_suffix = 5
 
         self.max_nWords = 200
         self.no_guide = no_guide
 
+        # 这三个是干什么用的呢？
+        # 应该是放在内存的随机数据
         self.max_data = max_data_seeds
         self.random_data = {}
         self.data_seeds = []
 
         self.inst_generator = rvInstGenerator('RV64G')
+        
+        self.cul_path = {}
+        self.CFG = self.get_cfg_cul_path(top_module=top_module)
+        
+
 
     def add_data(self, new_data=[]):
         if len(self.data_seeds) == self.max_data:
@@ -378,7 +407,9 @@ class rvMutator():
             name_suffix = '_gen'
         elif self.phase in [ MUTATION, MERGE ]:
             if self.phase == MUTATION:
-                seed_si = random.choice(self.corpus)
+                fitness = [indiv.explr_point for indiv in self.corpus]
+                # [seed_si] = random.choices(self.corpus, fitness)
+                [seed_si] = random.choices(self.corpus)
                 seed_prefix = deepcopy(seed_si.prefix)
                 seed_words = deepcopy(seed_si.words)
                 seed_suffix = deepcopy(seed_si.suffix)
@@ -388,8 +419,10 @@ class rvMutator():
                 #base = seed_si.it
             else:
                 seed_words = []
-                seed_si1 = random.choice(self.corpus)
-                seed_si2 = random.choice(self.corpus)
+                fitness = [indiv.explr_point for indiv in self.corpus]
+                # [seed_si1, seed_si2] = random.choices(self.corpus, fitness, k=2)
+                [seed_si1, seed_si2] = random.choices(self.corpus, k=2)
+                # seed_si2 = random.choice(self.corpus)
 
                 seed_prefix = deepcopy(seed_si1.prefix)
                 si1_words = deepcopy(seed_si1.words)
@@ -401,6 +434,7 @@ class rvMutator():
                 for i in range(idx):
                     seed_words.append(si1_words[i])
                 for i in range(idx, len(si2_words)):
+                    
                     seed_words.append(si2_words[i])
                 data_seed = seed_si1.get_seed()
                 template = seed_si1.get_template()
@@ -443,10 +477,35 @@ class rvMutator():
 
         return (sim_input, data)
 
+    def calculate_exploration(self):
+        for item in self.corpus:
+            item.explr_point = 0
+            for i in range(0,len(item.visited_path)):
+                item.explr_point += 1 / self.cul_path[item.visited_path[i]]
+        # self.corpus.sort(key=lambda x: x.explr_point, reverse=True)
+        
+    def calculate_uncov_alt(self):
+        for item in self.corpus:
+            visited_alt = {}
+            for i in range(0,len(item.visited_path)):
+                if item.visited_path[i] in self.CFG:
+                    cur_block = self.CFG[item.visited_path[i]]
+                    visited_alt[item.visited_path[i]] = True
+                    if cur_block['orig_idom']!=[]:
+                        for _item in self.CFG[cur_block['orig_idom'][0]]['successors']:
+                            if _item not in visited_alt and _item in self.cul_path and self.cul_path[_item] == 0:
+                                visited_alt[_item] = True
+                                item.uncov_alt_br += 1
+        a = 1
+                
+    
+
     def update_phase(self, it):
         if it < self.corpus_size / 10 or self.no_guide:
             self.phase = GENERATION
         else:
+            self.calculate_exploration()
+            self.calculate_uncov_alt()
             rand = random.random()
             if rand < 0.1:
                 self.phase = GENERATION
@@ -461,3 +520,36 @@ class rvMutator():
         self.num_words = min(self.num_words + 1, self.max_nWords)
         if len(self.corpus) > self.corpus_size:
             self.corpus.pop(0)
+            self.calculate_exploration()
+            self.calculate_uncov_alt()
+
+    def get_cfg_cul_path(self, top_module):
+        if top_module == None:
+            raise ValueError('top_module is None')
+        file_pkl = f'../CFG/{top_module}_cfg.pkl'
+        with open(file_pkl, 'rb') as file:
+            data = pickle.load(file)
+        
+        for key,value in data['count_to_assign'].items():
+            block = data['assign_to_block'][value]
+            self.cul_path[block] = 0
+        
+        return data
+        
+    def accumulate_coverage(self, path):
+        for i in range(len(path)):
+            if path[i] in self.cul_path:
+                self.cul_path[path[i]] += 1
+            else:
+                self.cul_path[path[i]] = 1
+        cur_cov = 0
+        # print acculumate coverage
+        for key, value in self.cul_path.items():
+            if value > 0:
+                idom = self.CFG[key]['orig_idom']
+                if idom != [] and idom[0] in self.cul_path and self.cul_path[idom[0]] == 0:
+                    self.cul_path[idom[0]] = value
+        for key, value in self.cul_path.items():
+            if value > 0:
+                cur_cov += 1
+        print(f'Current coverage: {cur_cov/len(self.cul_path)*100}%')
