@@ -502,11 +502,10 @@ class rvMutator():
                                 item.uncov_alt_br += 1
         # a = 1
     
-    def caluclate_unvisited_assign_dist(self):
+    def calculate_unvisited_assign_dist(self):
         for key in self.cul_path:
             if self.cul_path[key] == 0:
                 stack = [key]
-                pred_list = []
                 dict_depth = {key: 0}
                 # calculate the distance within 4
                 while stack:
