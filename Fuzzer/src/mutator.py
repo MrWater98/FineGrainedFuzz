@@ -41,6 +41,7 @@ class simInput():
         self.visited_path = []
         self.explr_point = float(0)
         self.uncov_alt_br = 0
+        
 
     def save(self, name, data=[]):
         prefix_insts = self.get_prefix()
@@ -139,6 +140,9 @@ class rvMutator():
         
         self.cul_path = {}
         self.CFG = self.get_cfg_cul_path(top_module=top_module)
+        # assign_dist should be a dictionary, key is the unvisited block id, we only collect distance within 5
+        self.assign_dist = {}
+        
         
 
 
@@ -496,8 +500,24 @@ class rvMutator():
                             if _item not in visited_alt and _item in self.cul_path and self.cul_path[_item] == 0:
                                 visited_alt[_item] = True
                                 item.uncov_alt_br += 1
-        a = 1
-                
+        # a = 1
+    
+    def caluclate_unvisited_assign_dist(self):
+        for key in self.cul_path:
+            if self.cul_path[key] == 0:
+                stack = [key]
+                pred_list = []
+                dict_depth = {key: 0}
+                # calculate the distance within 4
+                while stack:
+                    cur = stack.pop()
+                    if dict_depth[cur] <= 4:
+                        for pred in self.CFG[cur]['predecessors']:
+                            if pred not in dict_depth:
+                                dict_depth[pred] = dict_depth[cur] + 1
+                                stack.append(pred)
+                dict_depth.pop(key)
+                self.assign_dist[key] = dict_depth
     
 
     def update_phase(self, it):
@@ -506,6 +526,7 @@ class rvMutator():
         else:
             self.calculate_exploration()
             self.calculate_uncov_alt()
+            self.caluclate_unvisited_assign_dist()
             rand = random.random()
             if rand < 0.1:
                 self.phase = GENERATION
@@ -522,6 +543,7 @@ class rvMutator():
             self.corpus.pop(0)
             self.calculate_exploration()
             self.calculate_uncov_alt()
+            
 
     def get_cfg_cul_path(self, top_module):
         if top_module == None:
