@@ -885,7 +885,7 @@ def save_mismatch(base, proc_num, out, sim_input: simInput, data: list, num, it)
     shutil.copy(hexfile, out + '/hex/id_{}.hex'.format(num))
 
 def setup(dut, toplevel, template, out, proc_num, debug, minimizing=False, no_guide=False):
-    mutator = rvMutator(corpus_size=100, no_guide=no_guide, top_module=toplevel)
+    mutator = rvMutator(corpus_size=1000, no_guide=no_guide, top_module=toplevel)
 
     cc = 'riscv64-unknown-elf-gcc'
     elf2hex = 'riscv64-unknown-elf-elf2hex'

@@ -40,7 +40,8 @@ class simInput():
         
         self.visited_path = []
         self.explr_point = float(0)
-        self.uncov_alt_br = 0
+        self.uncov_alt_br = float(0)
+        self.assign_dist = 0
         
 
     def save(self, name, data=[]):
@@ -411,9 +412,23 @@ class rvMutator():
             name_suffix = '_gen'
         elif self.phase in [ MUTATION, MERGE ]:
             if self.phase == MUTATION:
-                fitness = [indiv.explr_point for indiv in self.corpus]
-                # [seed_si] = random.choices(self.corpus, fitness)
-                [seed_si] = random.choices(self.corpus)
+                # print("explr_point",self.corpus[0].explr_point)
+                # print("uncov_alt",self.corpus[0].uncov_alt_br)
+                # print("assign_dist",self.corpus[0].assign_dist)
+                
+                rand = random.random()
+                fitness_explr = [indiv.explr_point for indiv in self.corpus]
+                [seed_si1] = random.choices(self.corpus, fitness_explr)
+                if rand < 0.1:
+                    self.calculate_uncov_alt()
+                    fitness_uncov = [indiv.uncov_alt_br for indiv in self.corpus]
+                    [seed_si2] = random.choices(self.corpus, fitness_uncov)
+                    seed_si = random.choice([seed_si1, seed_si2])
+                else:
+                    seed_si = seed_si1
+                # seed_si = random.choice([seed_si1])
+                
+                # [seed_si] = random.choices(self.corpus)
                 seed_prefix = deepcopy(seed_si.prefix)
                 seed_words = deepcopy(seed_si.words)
                 seed_suffix = deepcopy(seed_si.suffix)
@@ -423,9 +438,21 @@ class rvMutator():
                 #base = seed_si.it
             else:
                 seed_words = []
-                fitness = [indiv.explr_point for indiv in self.corpus]
-                # [seed_si1, seed_si2] = random.choices(self.corpus, fitness, k=2)
-                [seed_si1, seed_si2] = random.choices(self.corpus, k=2)
+                # print("explr_point",self.corpus[0].explr_point)
+                # print("uncov_alt",self.corpus[0].uncov_alt_br)
+                # print("assign_dist",self.corpus[0].assign_dist)
+                rand = random.random()
+                fitness_explr = [indiv.explr_point for indiv in self.corpus]
+                
+                [seed_si11, seed_si12] = random.choices(self.corpus, fitness_explr, k=2)
+                if rand < 0.1:
+                    self.calculate_uncov_alt()
+                    fitness_uncov = [indiv.uncov_alt_br for indiv in self.corpus]
+                    [seed_si21, seed_si22] = random.choices(self.corpus, fitness_uncov, k=2)
+                    [seed_si1, seed_si2] = random.choices([seed_si11, seed_si12,seed_si21,seed_si22], k=2)
+                else:
+                    [seed_si1, seed_si2] = [seed_si11, seed_si12]
+                # [seed_si1, seed_si2] = random.choices([seed_si11, seed_si12], k=2)
                 # seed_si2 = random.choice(self.corpus)
 
                 seed_prefix = deepcopy(seed_si1.prefix)
@@ -490,42 +517,79 @@ class rvMutator():
         
     def calculate_uncov_alt(self):
         for item in self.corpus:
+            item.uncov_alt_br = 0
+        for item in self.corpus:
             visited_alt = {}
             for i in range(0,len(item.visited_path)):
                 if item.visited_path[i] in self.CFG:
                     cur_block = self.CFG[item.visited_path[i]]
                     visited_alt[item.visited_path[i]] = True
+                    # depth 1
                     if cur_block['orig_idom']!=[]:
-                        for _item in self.CFG[cur_block['orig_idom'][0]]['successors']:
+                        cur_orig_idom = cur_block['orig_idom'][0]
+                        for _item in self.CFG[cur_orig_idom]['successors']:
                             if _item not in visited_alt and _item in self.cul_path and self.cul_path[_item] == 0:
                                 visited_alt[_item] = True
                                 item.uncov_alt_br += 1
+                                break
+                        # depth 2
+                        if self.CFG[cur_orig_idom]['orig_idom']!=[]:
+                            cur_orig_idom2 = self.CFG[cur_orig_idom]['orig_idom'][0]
+                            for __item in self.CFG[cur_orig_idom2]['successors']:
+                                if __item not in visited_alt and __item in self.cul_path and self.cul_path[__item] == 0:
+                                    visited_alt[__item] = True
+                                    item.uncov_alt_br += 0.5
+                                    break
+                            # depth 3
+                            if self.CFG[cur_orig_idom2]['orig_idom']!=[]:
+                                cur_orig_idom3 = self.CFG[cur_orig_idom2]['orig_idom'][0]
+                                for ___item in self.CFG[cur_orig_idom3]['successors']:
+                                    if ___item not in visited_alt and ___item in self.cul_path and self.cul_path[___item] == 0:
+                                        visited_alt[___item] = True
+                                        item.uncov_alt_br += 1.0/3.0
+                                        break
         # a = 1
     
     def calculate_unvisited_assign_dist(self):
+        self.CFG['assign_block'] = set(self.CFG['assign_block'])
         for key in self.cul_path:
             if self.cul_path[key] == 0:
                 stack = [key]
                 dict_depth = {key: 0}
+                keys_to_remove = []
                 # calculate the distance within 4
                 while stack:
                     cur = stack.pop()
-                    if dict_depth[cur] <= 4:
+                    if cur in dict_depth and dict_depth[cur] <= 3:
                         for pred in self.CFG[cur]['predecessors']:
                             if pred not in dict_depth:
-                                dict_depth[pred] = dict_depth[cur] + 1
+                                if pred not in self.CFG['assign_block']:
+                                    dict_depth[pred] = dict_depth[cur] + 1
+                                else:
+                                    dict_depth[pred] = dict_depth[cur]
+                                    keys_to_remove.append(pred)
                                 stack.append(pred)
                 dict_depth.pop(key)
+                for item in keys_to_remove:
+                    dict_depth.pop(item)
                 self.assign_dist[key] = dict_depth
+                
+        for sim_input in self.corpus:
+            _min = 9999
+            for node in sim_input.visited_path:
+                for key in self.assign_dist:
+                    if node in self.assign_dist[key]:
+                        _min = min(_min,self.assign_dist[key][node])
+            sim_input.assign_dist = _min
+                
     
 
     def update_phase(self, it):
+        global visit_assign_dist
         if it < self.corpus_size / 10 or self.no_guide:
             self.phase = GENERATION
         else:
             self.calculate_exploration()
-            self.calculate_uncov_alt()
-            self.caluclate_unvisited_assign_dist()
             rand = random.random()
             if rand < 0.1:
                 self.phase = GENERATION
@@ -541,7 +605,6 @@ class rvMutator():
         if len(self.corpus) > self.corpus_size:
             self.corpus.pop(0)
             self.calculate_exploration()
-            self.calculate_uncov_alt()
             
 
     def get_cfg_cul_path(self, top_module):
