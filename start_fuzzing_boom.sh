@@ -14,7 +14,7 @@ export SPIKE="/root/lowrisc/bin/spike"
 #export MUTATE_FINER=0
 #export MEDELEG_MOD=0
 export FP_CSR=0
-export ALL_CSR=1
+export ALL_CSR=0
 
 # Only enable one config at a time
 if [ "$FP_CSR" == "1" ]
@@ -26,4 +26,4 @@ then
 	export SPIKE="/root/riscv-isa-sim-all-csr/build/bin/spike"
 fi
 
-make SIM_BUILD=build_boom_batch${BATCHNO} VFILE=SmallBoomTile_v1.2_state TOPLEVEL=BoomTile NUM_ITER=${ITERS} OUT=batch${BATCHNO} ALL_CSR=${ALL_CSR} FP_CSR=${FP_CSR} |& tee run.${BATCHNO}.boom.log
+make SIM_BUILD=build_boom_batch${BATCHNO} VFILE=BoomTile_CFG TOPLEVEL=BoomTile NUM_ITER=${ITERS} OUT=batch${BATCHNO} ALL_CSR=${ALL_CSR} FP_CSR=${FP_CSR} |& tee run.${BATCHNO}.boom.log

@@ -99,27 +99,6 @@ def Run(dut, toplevel,
 		if isa_input and rtl_input:
 			isa_log = out + "/trace/isa_" + str(it) + ".log"
 			name = str(sim_input.it)+sim_input.name_suffix
-			# ret = run_isa_test(isaHost, isa_input, stop, out, proc_num, assert_intr, isa_log, name)
-			# if ret == proc_state.ERR_ISA_TIMEOUT: 
-			# 	print("ISA Timeout")
-			# 	continue
-			# elif ret == proc_state.ERR_ISA_ASSERT: 
-			# 	print("ISA Assert Error")
-			# 	continue
-			# else:
-			# 	trns = extract_transitions(isa_log, out, it, ALL_CSR, FP_CSR)
-			# 	isa_csv = out+"/trace/isa_"+str(it)+".csv"
-			# 	process_spike_sim_log(isa_log, isa_csv)
-
-			# 	if trns==0: #Don't do RTL sim if the test does not have unique transitions
-			# 		input_files = out + '/tests/.input_{}{}.*'.format(it, sim_input.name_suffix)
-			# 		for ifi in glob.glob(input_files):
-			# 			os.remove(ifi)
-			# 		input_files = out + '/trace/isa_{}.*'.format(it)
-			# 		for ifi in glob.glob(input_files):
-			# 			os.remove(ifi)
-			# 		continue
-
 
 			try:
 				(ret, coverage, visit_path) = yield rtlHost.run_test(rtl_input, assert_intr, it)

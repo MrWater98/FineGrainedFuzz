@@ -115,7 +115,7 @@ class rvRTLhost():
     def get_path(self):
         # Iterate all coverages with coverage{i}
         path_list = []
-        for i in range(0,50):
+        for i in range(0,200):
             # if getattr(dut, "coverage{i}") is exist
             if hasattr(self.dut, "coverage{}".format(i)):
                 visit_path = getattr(self.dut, "coverage{}".format(i)).value

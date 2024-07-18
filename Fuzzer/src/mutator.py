@@ -41,6 +41,7 @@ class simInput():
         self.visited_path = []
         self.explr_point = float(0)
         self.uncov_alt_br = float(0)
+        self.dep_point = float(0)
         self.assign_dist = 0
         
 
@@ -419,14 +420,14 @@ class rvMutator():
                 rand = random.random()
                 fitness_explr = [indiv.explr_point for indiv in self.corpus]
                 [seed_si1] = random.choices(self.corpus, fitness_explr)
-                if rand < 0.1:
-                    self.calculate_uncov_alt()
-                    fitness_uncov = [indiv.uncov_alt_br for indiv in self.corpus]
+                if rand < 0.2:
+                    self.calculate_depdency()
+                    fitness_uncov = [indiv.dep_point for indiv in self.corpus]
                     [seed_si2] = random.choices(self.corpus, fitness_uncov)
                     seed_si = random.choice([seed_si1, seed_si2])
                 else:
                     seed_si = seed_si1
-                # seed_si = random.choice([seed_si1])
+                seed_si = random.choice([seed_si1])
                 
                 # [seed_si] = random.choices(self.corpus)
                 seed_prefix = deepcopy(seed_si.prefix)
@@ -445,15 +446,15 @@ class rvMutator():
                 fitness_explr = [indiv.explr_point for indiv in self.corpus]
                 
                 [seed_si11, seed_si12] = random.choices(self.corpus, fitness_explr, k=2)
-                if rand < 0.1:
-                    self.calculate_uncov_alt()
-                    fitness_uncov = [indiv.uncov_alt_br for indiv in self.corpus]
+                if rand < 0.2:
+                    self.calculate_depdency()
+                    fitness_uncov = [indiv.dep_point for indiv in self.corpus]
                     [seed_si21, seed_si22] = random.choices(self.corpus, fitness_uncov, k=2)
                     [seed_si1, seed_si2] = random.choices([seed_si11, seed_si12,seed_si21,seed_si22], k=2)
                 else:
                     [seed_si1, seed_si2] = [seed_si11, seed_si12]
                 # [seed_si1, seed_si2] = random.choices([seed_si11, seed_si12], k=2)
-                # seed_si2 = random.choice(self.corpus)
+                # [seed_si1, seed_si2] = random.choices(self.corpus, k=2)
 
                 seed_prefix = deepcopy(seed_si1.prefix)
                 si1_words = deepcopy(seed_si1.words)
@@ -513,8 +514,29 @@ class rvMutator():
             item.explr_point = 0
             for i in range(0,len(item.visited_path)):
                 item.explr_point += 1 / self.cul_path[item.visited_path[i]]
-        # self.corpus.sort(key=lambda x: x.explr_point, reverse=True)
-        
+    
+    def calculate_depdency(self):
+        for item in self.corpus:
+            item.dep_point = 0
+        for item in self.corpus:
+            for i in range(0,len(item.visited_path)):
+                queue = [(item.visited_path[i],0)]
+                break_flag = False
+                while not break_flag:
+                    if queue == []:
+                        break
+                    cur = queue.pop(0)
+                    if cur[0] in self.CFG:
+                        cur_block = self.CFG[cur[0]]
+                        for succ in cur_block['successors']:
+                            if succ in self.cul_path and self.cul_path[succ] == 0:
+                                item.dep_point += 1 / (cur[1]+1)
+                                break_flag = True
+                                break
+                            if cur[1]+1<=3:
+                                queue.append((succ,cur[1]+1))
+                        
+    
     def calculate_uncov_alt(self):
         for item in self.corpus:
             item.uncov_alt_br = 0
@@ -589,13 +611,14 @@ class rvMutator():
         if it < self.corpus_size / 10 or self.no_guide:
             self.phase = GENERATION
         else:
-            self.calculate_exploration()
             rand = random.random()
             if rand < 0.1:
                 self.phase = GENERATION
             elif rand < 0.55:
+                self.calculate_exploration()
                 self.phase = MUTATION
             else:
+                self.calculate_exploration()
                 self.phase = MERGE
 
     def add_corpus(self, sim_input):
@@ -603,9 +626,7 @@ class rvMutator():
 
         self.num_words = min(self.num_words + 1, self.max_nWords)
         if len(self.corpus) > self.corpus_size:
-            self.corpus.pop(0)
-            self.calculate_exploration()
-            
+            self.corpus.pop(0)      
 
     def get_cfg_cul_path(self, top_module):
         if top_module == None:
