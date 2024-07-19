@@ -1,48 +1,39 @@
-# ProcessorFuzz: Processor Fuzzing with Control and Status Registers Guidance
+# Improving Processor Fuzzing through Dependency-aware Control Flow Analysis in Flattened Design
 
-## Summary
-ProcessorFuzz is a processor fuzzer tool that identifies "interesting" assembly-based test based on isa-simulator feedback and discovers bugs based on the discrepancies between ISA and RTL simulation. The project is [published](https://ieeexplore.ieee.org/document/10133714) in 2023 IEEE International Symposium on Hardware Oriented Security and Trust (HOST). ProcessorFuzz's implementation is based on a previous work, [DIFUZZRTL](https://github.com/compsec-snu/difuzz-rtl).
+## Introduction
+This project aims to enhance processor fuzzing by extracting control flow graphs (CFGs) from flattened processor designs and analyzing the dependencies of branch statements within these graphs. Experimental results demonstrate the effectiveness of utilizing control flow information derived from flattened designs in enhancing the convergence speed of coverage metrics and guiding test sequences towards hard-to-reach states.
 
-## Setup
-ProcessorFuzz uses many other projects including spike, dromajo, rocket, boom, blackparrot. To prevent setup issues, we generated a docker image and tested that image on ubuntu 18.04.
-Download the docker image from this [link](https://drive.google.com/file/d/1fdq18U2CvbaV9QxFMjuFxF5nmL9CrBxj/view?usp=sharing) and execute the following command on ubuntu machine that has docker.
-```
-docker load < processorfuzz_docker_img.tar
-```
-### ProcessorFuzz Source
-ProcessorFuzz fuzzer source for Rocket and BOOM cores are in the main branch of this repo while the ProcessorFuzz source for fuzzing Black-Parrot processor in in the BP brnach. 
+## Features
+- **Flattened RTL Design**: Simplifies dependency analysis and helps identify critical test areas by flattening the target processor RTL design.
+- **Dependency Analysis**: Performs dependency-aware control flow analysis to extract the dependencies of basic blocks (BBs) and build a control flow graph (CFG).
+- **Optimized Test Generation**: Integrates an input evaluation and selection algorithm to continuously optimize the test corpus for improved functional coverage.
+- **Proven Effectiveness**: Demonstrates superior functional coverage on complex processor designs compared to traditional methods.
 
+## Framework
+The framework consists of three main parts:
+1. **RTL Flattening**: Converts hierarchical RTL models into a flattened structure to simplify subsequent analysis. (Benchmark/Verilog/xxx_CFG.v)
+2. **Static Analysis**: Extracts dependency relationships of basic blocks (BBs) by constructing a control flow graph (CFG). (CFG/xxx.txt & CFG/xxx.pkl)
+3. **Fuzzing Loop**: Integrates these dependency relationships into a traditional fuzzing loop to guide and optimize directed test generation. 
 
-## Quick start
+## Directory Structure
 
-For fuzzing Rocket core in the docker image, execute the start_fuzzing_rocket.sh script with the name (or number) of the batch and the number of iterations for the fuzzing session. 
-For example, to run a fuzzing session with the batch name "1" with 100 test iterations. 
-```
-cd /root/processorfuzz/main/
-./start_fuzzing_rocket.sh 1 100
-```
+Fuzz_RTL
+├── Benchmarks
+├── CFG
+├── firrtl
+├── Fuzzer
+├── script
+├── spike
+├── .gitignore
+├── .gitmodules
+├── docker_cmd
+├── LICENSE
+├── README.md
+├── run_docker.sh
+├── start_fuzzing_boom.sh
+└── start_fuzzing_rocket.sh
 
-For fuzzing BOOM core in the docker image, execute the start_fuzzing_boom.sh script with the name (or number) of the batch and the number of iterations for the fuzzing session. 
-For example, to run a fuzzing session with the batch name "2" with 100 test iterations. 
-```
-cd /root/processorfuzz/main/
-./start_fuzzing_boom.sh 2 100
-```
+## Command
 
-Take a look at the BP branch for the instructions on fuzzing Black-Parrot core. 
-
-### Enabling FP_CSR and ALL_CSR configurations
-
-By default, ProcessorFuzz use the selected mode where transitions of a select set of CSRs are used as coverage.  
-You can enable FP_CSR or ALL_CSR configuration by editing the relevant start_fuzzing_*.sh script. 
-
-To enable FP_CSR mode:
-```
-export FP_CSR=1
-export ALL_CSR=0
-```
-To enable ALL_CSR mode:
-```
-export FP_CSR=0
-export ALL_CSR=1
-```
+./start_fuzzing_boom.sh 0 10000 > log/boom_1000_Explr_Alt2.log 2>&1 &
+./start_fuzzing_rocket.sh 0 10000 > log2/rocket3.log 2>&1 &
