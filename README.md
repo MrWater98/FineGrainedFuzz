@@ -26,4 +26,4 @@ Example: ./start_fuzzing_rocket.sh 0 10000
 
 ## Notice
 
-This project is derived from [https://github.com/bu-icsg/ProcessorFuzz](https://github.com/bu-icsg/ProcessorFuzz)
+This project is partially derived from ProcessorFuzz. 
