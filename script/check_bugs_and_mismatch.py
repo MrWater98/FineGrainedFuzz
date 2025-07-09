@@ -13,7 +13,7 @@ def main(filename):
     parsing = True  # Flag to stop after ElapsedTime includes 'day'
 
     bug_re = re.compile(r"Bug\s+(\d+):")
-    mismatch_bug_re = re.compile(r"\[ProcessorFuzz\] Bug -- (\d+) \[Mismatch\]")
+    mismatch_bug_re = re.compile(r"\[FineGrainedFuzz\] Bug -- (\d+) \[Mismatch\]")
     iter_re = re.compile(r"Iteration:\s*(\d+),\s*ElapsedTime:\s*([^,]+),")
     normal_mismatch_re = re.compile(r"^MISMATCH: (.+)")
     next_mismatch_is_bug = False
