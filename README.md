@@ -2,17 +2,8 @@
 
 ## Overview
 
-This project improves processor fuzzing by flattening RTL designs and performing static analysis to extract **control flow graphs (CFGs)** and basic block dependencies. Using this control flow information accelerates coverage convergence and helps generate tests that reach edge cases more efficiently.
+This project improves processor fuzzing by Fine-Grained Code Analysis.
 
----
-
-## Workflow
-
-1. **RTL Flattening**: Transforms hierarchical RTL into a flat Verilog file  
-2. **Static Analysis**: Symbolically analyzes the flattened RTL to extract CFG and dependencies  
-3. **Fuzzing Loop**: Uses control flow information to guide efficient test generation
-
----
 
 ## Directory Structure
 
@@ -23,8 +14,6 @@ This project improves processor fuzzing by flattening RTL designs and performing
   - Contains exported control flow graphs (see `.txt` files for details)  
 - **Fuzzer/**  
   - Core fuzzing and test generation scripts
-
----
 
 ## How to Run
 
