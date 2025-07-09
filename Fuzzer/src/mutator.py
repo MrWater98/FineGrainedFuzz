@@ -123,17 +123,16 @@ class rvMutator():
         self.phases = [GENERATION, MUTATION, MERGE]
         self.phase = GENERATION
 
-        # 这个是什么意思，为什么num_prefix是3呢？num_prefix又是什么意思?
+        
         self.num_prefix = 3
         self.num_words = 100
-        # 这个是什么意思，为什么num_suffix是3呢？num_suffix又是什么意思?
+        
         self.num_suffix = 5
 
         self.max_nWords = 200
         self.no_guide = no_guide
 
-        # 这三个是干什么用的呢？
-        # 应该是放在内存的随机数据
+        
         self.max_data = max_data_seeds
         self.random_data = {}
         self.data_seeds = []

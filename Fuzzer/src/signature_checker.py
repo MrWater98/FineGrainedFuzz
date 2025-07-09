@@ -109,7 +109,7 @@ class sigChecker():
             intr_prv = MACHINE
             epc = mepc
 
-        self.debug_print('[ProcessorFuzz] {} interrupt handled -- epc {:016x}'.
+        self.debug_print('{} interrupt handled -- epc {:016x}'.
                          format(prv[intr_prv], epc), intr_prv != NONE)
 
         return intr_prv, epc

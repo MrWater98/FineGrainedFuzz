@@ -818,7 +818,7 @@ def save_err(out: str, proc_num: int, manager: procManager, stop_code: int, it):
 
     manager.P('state')
     fd = open(out + '/fuzz_log', 'a')
-    fd.write('[ProcessorFuzz] Thread {}: {} occurred\n'.format(proc_num, status))
+    fd.write('Thread {}: {} occurred\n'.format(proc_num, status))
     fd.close()
 
     if not os.path.isdir(out + '/err'):

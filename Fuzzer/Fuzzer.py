@@ -25,9 +25,9 @@ from spike_log_to_trace_csv import process_spike_sim_log
 @coroutine
 def Run(dut, toplevel,
 		num_iter=1, template='Template', in_file=None,
-		out='output', record=False, cov_log=None,
+		out='output', record=True, cov_log=None,
 		multicore=0, manager=None, proc_num=0, start_time=0, start_iter=0, start_cov=0,
-		prob_intr=0, no_guide=False, seed_dir=None, debug=False, run_elf=None, ALL_CSR=False, FP_CSR=False):
+		prob_intr=0, no_guide=False, seed_dir=None, debug=True, run_elf=None, ALL_CSR=False, FP_CSR=False):
 
 	assert toplevel in ['RocketTile', 'BoomTile' ], \
 		'{} is not toplevel'.format(toplevel)
@@ -49,7 +49,7 @@ def Run(dut, toplevel,
 	mis_count = 0
 	last_coverage = 0
 	coverage = 0
-	print('[ProcessorFuzz] Start Fuzzing', debug)
+	print('Start Fuzzing', debug)
 
 	if multicore:
 		yield manager.cov_restore(dut)
@@ -58,7 +58,7 @@ def Run(dut, toplevel,
 	ct = datetime.now()
 
 	for it in range(1, num_iter+1):
-		print('[ProcessorFuzz] Iteration [{}]'.format(it), debug)
+		print('Iteration [{}]'.format(it), debug)
 
 		if multicore:
 			if it == 0:
@@ -79,7 +79,7 @@ def Run(dut, toplevel,
 			(sim_input, data) = mutator.get(it, assert_intr)
 
 		if debug:
-			print('[ProcessorFuzz] Fuzz Instructions')
+			print('Fuzz Instructions')
 			for inst, INT in zip(sim_input.get_insts(), sim_input.ints + [0]):
 				print('{:<50}{:04b}'.format(inst, INT))
 
@@ -98,10 +98,14 @@ def Run(dut, toplevel,
 
 		if isa_input and rtl_input:
 			isa_log = out + "/trace/isa_" + str(it) + ".log"
+			isa_csv = out+"/trace/isa_"+str(it)+".csv"
 			name = str(sim_input.it)+sim_input.name_suffix
-
+			
 			try:
 				(ret, coverage, visit_path) = yield rtlHost.run_test(rtl_input, assert_intr, it)
+				ret = run_isa_test(isaHost, isa_input, stop, out, proc_num, assert_intr, isa_log, name)
+				trns = extract_transitions(isa_log, out, it, ALL_CSR, FP_CSR)
+				process_spike_sim_log(isa_log, isa_csv)
 			except:
 				stop[0] = proc_state.ERR_RTL_SIM
 				print("ERROR: Test run failed")
@@ -112,69 +116,70 @@ def Run(dut, toplevel,
 			
 			
 
-			# rtl_log = out+"/trace/rtl_"+str(it)+".log"
-			# chk = trace_compare(isa_csv, rtl_log, toplevel)
-			# if chk==-1: mis_count += 1
+			rtl_log = out+"/trace/rtl_"+str(it)+".log"
+			
+			chk = trace_compare(isa_csv, rtl_log, toplevel)
+			if chk==-1: mis_count += 1
 
-			# if assert_intr and ret == SUCCESS:
-			# 	(intr_prv, epc) = checker.check_intr(symbols)
-			# 	if epc != 0:
-			# 		preprocessor.write_isa_intr(isa_input, rtl_input, epc)
-			# 		ret = run_isa_test(isaHost, isa_input, stop, out, proc_num, True, isa_log, it)
-			# 		if ret == proc_state.ERR_ISA_TIMEOUT: 
-			# 			print("ERROR: ISA Timeout")
-			# 			continue
-			# 		elif ret == proc_state.ERR_ISA_ASSERT: 
-			# 			print("ERROR: ISA Assert")
-			# 			continue
-			# 	else: continue
+			if assert_intr and ret == SUCCESS:
+				(intr_prv, epc) = checker.check_intr(symbols)
+				if epc != 0:
+					preprocessor.write_isa_intr(isa_input, rtl_input, epc)
+					ret = run_isa_test(isaHost, isa_input, stop, out, proc_num, True, isa_log, it)
+					if ret == proc_state.ERR_ISA_TIMEOUT: 
+						print("ERROR: ISA Timeout")
+						continue
+					elif ret == proc_state.ERR_ISA_ASSERT: 
+						print("ERROR: ISA Assert")
+						continue
+				else: continue
 			ct = datetime.now()
 			# print("Iteration: {}, ElapsedTime: {}, Coverage: {}, Transitions: {}".format(it, ct-now, coverage, trns))
    
 			print("Iteration: {}, ElapsedTime: {}, Coverage: {}".format(it, ct-now, coverage))
 			cause = '-'
-			# match = False
-			# if ret == SUCCESS:
-			# 	match = checker.check(symbols)
-			# elif ret == ILL_MEM:
-			# 	match = True
-			# 	debug_print('[ProcessorFuzz] Memory access outside DRAM -- {}'. \
-			# 				format(iNum), debug, True)
-			# 	if record:
-			# 		save_mismatch(out, proc_num, out + '/illegal',
-			# 					  sim_input, data, iNum, it)
-			# 	iNum += 1
+			match = False
+			if ret == SUCCESS:
+				match = checker.check(symbols)
+			elif ret == ILL_MEM:
+				match = True
+				debug_print('Memory access outside DRAM -- {}'. \
+							format(iNum), debug, True)
+				if record:
+					save_mismatch(out, proc_num, out + '/illegal',
+								  sim_input, data, iNum, it)
+				iNum += 1
 
-			# if (not match) or ret not in [SUCCESS, ILL_MEM]:
-			# 	if multicore:
-			# 		mNum = manager.read_num('mNum')
-			# 		manager.write_num('mNum', mNum + 1)
+			if (not match) or ret not in [SUCCESS, ILL_MEM]:
+				if multicore:
+					mNum = manager.read_num('mNum')
+					manager.write_num('mNum', mNum + 1)
 
-			# 	if record:
-			# 		save_mismatch(out, proc_num, out + '/mismatch',
-			# 					  sim_input, data, mNum, it)
+				if record:
+					save_mismatch(out, proc_num, out + '/mismatch',
+								  sim_input, data, mNum, it)
 
-			# 	mNum += 1
-			# 	if ret == TIME_OUT: cause = 'Timeout'
-			# 	elif ret == ASSERTION_FAIL: cause = 'Assertion fail'
-			# 	else: cause = 'Mismatch'
+				mNum += 1
+				if ret == TIME_OUT: cause = 'Timeout'
+				elif ret == ASSERTION_FAIL: cause = 'Assertion fail'
+				else: cause = 'Mismatch'
 
-			# 	debug_print('[ProcessorFuzz] Bug -- {} [{}]'. \
-			# 				format(mNum, cause), debug, not match or (ret != SUCCESS))
+				debug_print('Bug -- {} [{}]'. \
+							format(mNum, cause), debug, not match or (ret != SUCCESS))
 			
 
-			# if trns>0:
-			# 	if multicore:
-			# 		cNum = manager.read_num('cNum')
-			# 		manager.write_num('cNum', cNum + 1)
+			if trns>0:
+				if multicore:
+					cNum = manager.read_num('cNum')
+					manager.write_num('cNum', cNum + 1)
 
-			# 	if record:
-			# 		save_file(cov_log, 'a', '{:<10}\t{:<10}\t{:<10}\n'.
-			# 				  format(time.time() - start_time, start_iter + it,
-			# 						 start_cov + coverage))
-			# 		sim_input.save(out + '/corpus/id_{}.si'.format(cNum))
+				if record:
+					save_file(cov_log, 'a', '{:<10}\t{:<10}\t{:<10}\n'.
+							  format(time.time() - start_time, start_iter + it,
+									 start_cov + coverage))
+					sim_input.save(out + '/corpus/id_{}.si'.format(cNum))
 
-			# 	cNum += 1
+				cNum += 1
 			mutator.add_corpus(sim_input)
 			last_coverage = coverage
 			# Remove symbols and hex files to save storage
@@ -204,7 +209,7 @@ def Run(dut, toplevel,
 		save_err(out, proc_num, manager, stop[0])
 		manager.set_state(proc_num, stop[0])
 
-	debug_print('[ProcessorFuzz] Stop Fuzzing', debug)
+	debug_print('Stop Fuzzing', debug)
 	print("MISMATCH COUNT: ",mis_count)
 
 	if multicore:

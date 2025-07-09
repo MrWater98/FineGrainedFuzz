@@ -28,19 +28,19 @@ def Minimize(dut, toplevel,
     if not os.path.isdir(min_dir):
         os.makedirs(min_dir)
 
-    print('[ProcessorFuzz] Start Minimizing')
+    print('Start Minimizing')
 
     siNames = os.listdir(in_dir)
     start = proc_num * ((len(siNames) // num_cores) + 1)
     end = (proc_num + 1) * ((len(siNames) // num_cores) + 1)
     for siName in siNames[start:end]:
-        print('[ProcessorFuzz] Minimizing {}'.format(siName))
+        print('Minimizing {}'.format(siName))
 
         minName = min_dir + '/' + siName.split('.si')[0] + '_min.si'
         (sim_input, data, assert_intr) = mutator.read_siminput(in_dir + '/' + siName)
 
         if debug:
-            print('[ProcessorFuzz] Original Instructions')
+            print('Original Instructions')
             for inst, INT in zip(sim_input.get_insts(), sim_input.ints + [0]):
                 print('{:<50}{:04b}'.format(inst, INT))
 
@@ -90,7 +90,7 @@ def Minimize(dut, toplevel,
                         (tmp_input, data) = mutator.delete_nop(min_input)
 
                     if debug:
-                        print('[ProcessorFuzz] Minimized Instructions')
+                        print('Minimized Instructions')
                         for inst in tmp_input.get_insts():
                             print(inst)
 
@@ -129,4 +129,4 @@ def Minimize(dut, toplevel,
 
                 min_input.save(minName, data)
 
-    debug_print('[ProcessorFuzz] Stop Minimizing', debug)
+    debug_print('Stop Minimizing', debug)

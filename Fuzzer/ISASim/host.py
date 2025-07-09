@@ -8,7 +8,7 @@ class isaInput():
         self.intrfile = intrfile
 
 class rvISAhost():
-    def __init__(self, spike, spike_args, isa_sigfile, debug=False):
+    def __init__(self, spike, spike_args, isa_sigfile, debug=True):
         self.spike = spike
         self.spike_args = spike_args
         self.isa_sigfile = isa_sigfile
